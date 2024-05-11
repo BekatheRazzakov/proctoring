@@ -1,8 +1,8 @@
 services:
-  bonuses:
+  proctoring:
     build: ./
-    container_name: dashboard
+    container_name: proctoring
     ports:
-      - '3000:3000'
+      - '3002:3000'
     stdin_open: true
     tty: true

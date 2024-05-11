@@ -1,20 +1,23 @@
+import React, { useState, useEffect } from 'react';
 import Webcam from 'react-webcam';
-import { useFaceDetection} from 'react-use-face-detection';
+import { useFaceDetection } from 'react-use-face-detection';
 import FaceDetection from '@mediapipe/face_detection';
-import {Camera} from '@mediapipe/camera_utils';
+import { Camera } from '@mediapipe/camera_utils';
 
 const width = 500;
 const height = 500;
 
 const App = () => {
-  const {webcamRef, boundingBox, detected, facesDetected} = useFaceDetection({
+  const [isLookingForward, setIsLookingForward] = useState(false);
+
+  const { webcamRef, boundingBox, detected, facesDetected } = useFaceDetection({
     faceDetectionOptions: {
       model: 'short',
     },
     faceDetection: new FaceDetection.FaceDetection({
       locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`,
     }),
-    camera: ({mediaSrc, onFrame}) =>
+    camera: ({ mediaSrc, onFrame }) =>
       new Camera(mediaSrc, {
         onFrame,
         width,
@@ -22,11 +25,37 @@ const App = () => {
       }),
   });
 
+  useEffect(() => {
+    const checkLookingForward = () => {
+      if (boundingBox.length > 0) {
+        const box = boundingBox[0];
+
+        const eyeMidpointX = box.xCenter * width;
+        const eyeMidpointY = box.yCenter * height;
+
+        // Calculate distance between eye midpoint and screen midpoint
+        const distanceX = Math.abs(eyeMidpointX - width / 2);
+        const distanceY = Math.abs(eyeMidpointY - height / 2);
+
+        // Check if the face is roughly centered within the frame and not looking too much up, down, left, or right
+        const maxDistance = width * 0.4; // Adjust this value based on your requirement
+        const isCentered = distanceX < maxDistance && distanceY < maxDistance;
+
+        setIsLookingForward(isCentered);
+      } else {
+        setIsLookingForward(false); // No face detected, not looking forward
+      }
+    };
+
+    checkLookingForward();
+  }, [boundingBox]);
+
   return (
     <div>
       <p>{`Face Detected: ${detected}`}</p>
       <p>{`Number of faces detected: ${facesDetected}`}</p>
-      <div style={{width, height, position: 'relative'}}>
+      <p>{`Looking forward: ${isLookingForward ? 'Yes' : 'No'}`}</p>
+      <div style={{ width, height, position: 'relative' }}>
         {boundingBox.map((box, index) => (
           <div
             key={`${index + 1}`}

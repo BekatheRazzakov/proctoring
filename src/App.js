@@ -33,17 +33,15 @@ const App = () => {
         const eyeMidpointX = box.xCenter * width;
         const eyeMidpointY = box.yCenter * height;
 
-        // Calculate distance between eye midpoint and screen midpoint
         const distanceX = Math.abs(eyeMidpointX - width / 2);
         const distanceY = Math.abs(eyeMidpointY - height / 2);
 
-        // Check if the face is roughly centered within the frame and not looking too much up, down, left, or right
-        const maxDistance = width * 0.4; // Adjust this value based on your requirement
+        const maxDistance = width * 0.4;
         const isCentered = distanceX < maxDistance && distanceY < maxDistance;
 
         setIsLookingForward(isCentered);
       } else {
-        setIsLookingForward(false); // No face detected, not looking forward
+        setIsLookingForward(false);
       }
     };
 

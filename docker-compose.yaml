@@ -3,6 +3,6 @@ services:
     build: ./
     container_name: proctoring
     ports:
-      - '3003:3000'
+      - '3000:3000'
     stdin_open: true
     tty: true
